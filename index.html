@@ -8,7 +8,6 @@
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <style>
     :root {
-      /* Matching Zynth App Color Palette */
       --bg-canvas: #0b1120;
       --bg-primary: #0f172a;
       --bg-secondary: #111827;
@@ -59,7 +58,6 @@
       flex-direction: column;
     }
 
-    /* Grid pattern overlay like the app canvas */
     body::before {
       content: "";
       position: fixed;
@@ -76,7 +74,6 @@
       background-size: 40px 40px;
     }
 
-    /* Typography */
     h1, h2, h3, h4 {
       font-weight: 600;
       letter-spacing: -0.01em;
@@ -94,7 +91,6 @@
       line-height: 1.7;
     }
 
-    /* Layout */
     .container {
       width: 100%;
       max-width: 1200px;
@@ -104,7 +100,6 @@
       z-index: 1;
     }
 
-    /* Header - App-style dark navy */
     header {
       position: sticky;
       top: 0;
@@ -157,9 +152,7 @@
       position: relative;
     }
 
-    .nav-links a:hover {
-      color: var(--text-primary);
-    }
+    .nav-links a:hover { color: var(--text-primary); }
 
     .nav-links a::after {
       content: '';
@@ -173,11 +166,8 @@
       border-radius: 2px;
     }
 
-    .nav-links a:hover::after {
-      width: 100%;
-    }
+    .nav-links a:hover::after { width: 100%; }
 
-    /* Buttons - Cyan accent like the app */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -206,6 +196,12 @@
       box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
     }
 
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .btn-secondary {
       background: var(--bg-tertiary);
       color: var(--text-primary);
@@ -223,7 +219,6 @@
       font-size: 0.9375rem;
     }
 
-    /* Hero Section */
     .hero {
       padding: 100px 0 80px;
       position: relative;
@@ -284,9 +279,9 @@
       display: flex;
       gap: 12px;
       margin-top: 8px;
+      flex-wrap: wrap;
     }
 
-    /* Hero Visual - Schema table cards like the app */
     .hero-visual {
       position: relative;
       aspect-ratio: 4/3;
@@ -356,15 +351,8 @@
       font-size: 0.8125rem;
     }
 
-    .key {
-      color: var(--text-secondary);
-    }
-
-    .type {
-      color: var(--text-tertiary);
-      font-size: 0.75rem;
-    }
-
+    .key { color: var(--text-secondary); }
+    .type { color: var(--text-tertiary); font-size: 0.75rem; }
     .pk {
       color: var(--accent);
       font-weight: 600;
@@ -372,7 +360,6 @@
       margin-right: 4px;
     }
 
-    /* Sections */
     section {
       padding: 80px 0;
       position: relative;
@@ -382,16 +369,12 @@
       margin-bottom: 48px;
     }
 
-    .section-header h2 {
-      margin-bottom: 12px;
-    }
-
+    .section-header h2 { margin-bottom: 12px; }
     .section-header p {
       font-size: 1.125rem;
       color: var(--text-secondary);
     }
 
-    /* Features Grid - App panel style */
     .features-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -408,9 +391,7 @@
       transition: all 0.2s ease;
     }
 
-    .feature-card:hover {
-      background: var(--bg-tertiary);
-    }
+    .feature-card:hover { background: var(--bg-tertiary); }
 
     .feature-icon {
       width: 40px;
@@ -439,7 +420,6 @@
       color: var(--text-secondary);
     }
 
-    /* Split Layout */
     .split-layout {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -455,9 +435,7 @@
       position: relative;
     }
 
-    .copy-block:hover {
-      border-color: var(--border-hover);
-    }
+    .copy-block:hover { border-color: var(--border-hover); }
 
     .copy-block h3 {
       margin-bottom: 12px;
@@ -483,7 +461,6 @@
       color: var(--text-secondary);
     }
 
-    /* Snapshots */
     .shots-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -530,7 +507,6 @@
       color: var(--text-tertiary);
     }
 
-    /* Download Section - App panel style */
     .download-card {
       background: var(--bg-secondary);
       border: 1px solid var(--border-default);
@@ -556,11 +532,7 @@
       pointer-events: none;
     }
 
-    .download-content {
-      position: relative;
-      z-index: 1;
-    }
-
+    .download-content { position: relative; z-index: 1; }
     .download-content h2 {
       margin-bottom: 12px;
       color: var(--text-primary);
@@ -599,6 +571,18 @@
       animation: pulse 2s infinite;
     }
 
+    .status-indicator.error::before {
+      background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+      animation: none;
+    }
+
+    .status-indicator.success::before {
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+      animation: none;
+    }
+
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
@@ -611,7 +595,6 @@
       z-index: 1;
     }
 
-    /* Contact Section */
     .contact-grid {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -639,7 +622,6 @@
       color: var(--text-secondary);
     }
 
-    /* Footer */
     footer {
       margin-top: auto;
       background: var(--bg-primary);
@@ -666,11 +648,8 @@
       transition: color 0.2s ease;
     }
 
-    .footer-links a:hover {
-      color: var(--accent);
-    }
+    .footer-links a:hover { color: var(--accent); }
 
-    /* Animations */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -684,69 +663,40 @@
     .delay-1 { animation-delay: 0.1s; }
     .delay-2 { animation-delay: 0.2s; }
 
-    /* Scrollbar - App style */
     ::-webkit-scrollbar {
       width: 10px;
       height: 10px;
     }
 
-    ::-webkit-scrollbar-track {
-      background: var(--bg-primary);
-    }
-
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
     ::-webkit-scrollbar-thumb {
       background: var(--border-default);
       border-radius: 5px;
       border: 2px solid var(--bg-primary);
     }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--border-hover);
-    }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
 
-    /* Responsive */
     @media (max-width: 968px) {
-      .hero-grid,
-      .split-layout,
-      .contact-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .features-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero {
-        padding: 60px 0 40px;
-      }
-
-      .hero-visual {
-        aspect-ratio: 16/10;
-      }
-
+      .hero-grid, .split-layout, .contact-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .hero { padding: 60px 0 40px; }
+      .hero-visual { aspect-ratio: 16/10; }
       .download-card {
         flex-direction: column;
         text-align: center;
         padding: 32px;
       }
-
       .download-actions {
         width: 100%;
         justify-content: center;
+        flex-wrap: wrap;
       }
-
-      .nav-links {
-        display: none;
-      }
-
+      .nav-links { display: none; }
       .floating-card {
         min-width: 150px;
         padding: 12px;
       }
-    }
-
-    @media (min-width: 969px) {
-      .mobile-menu-btn { display: none; }
     }
 
     .mobile-menu-btn {
@@ -755,6 +705,24 @@
       color: var(--text-secondary);
       cursor: pointer;
       padding: 8px;
+    }
+
+    @media (min-width: 969px) {
+      .mobile-menu-btn { display: none; }
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(6, 182, 212, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 <base target="_blank">
@@ -775,7 +743,7 @@
         <a href="#download">Download</a>
         <a href="#contact">Contact</a>
         <a href="https://github.com/AstroNutws/ZYNTH" target="_blank" rel="noopener">GitHub</a>
-        <a href="#download" class="btn btn-primary">Download</a>
+        <a href="#download" class="btn btn-primary" onclick="handleDownloadClick(event)">Download .rar</a>
       </nav>
 
       <button class="mobile-menu-btn" aria-label="Menu">
@@ -798,12 +766,12 @@
             structure, without losing accuracy.
           </p>
           <div class="hero-actions">
-            <a href="#download" class="btn btn-primary btn-large">
-              Download Latest
+            <button class="btn btn-primary btn-large" onclick="handleDownloadClick(event)" id="heroDownloadBtn">
+              <span>Download Latest .rar</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/>
               </svg>
-            </a>
+            </button>
             <a href="https://github.com/AstroNutws/ZYNTH" class="btn btn-secondary btn-large" target="_blank" rel="noopener">
               View Source
             </a>
@@ -954,23 +922,26 @@
         <div class="download-card animate-in">
           <div class="download-content">
             <h2>Download Zynth</h2>
-            <p>Latest release available for macOS, Windows, and Linux. Automatic updates via GitHub Releases. 
-            Free and open source under MIT license.</p>
+            <p>Automatically downloads the latest <strong>.rar</strong> release from GitHub. 
+            Available for Windows. If no .rar is found, you'll be redirected to the releases page.</p>
             <div class="download-meta">
-              <span class="status-indicator" id="releaseStatus">Resolving latest release...</span>
+              <span class="status-indicator" id="releaseStatus">
+                <span class="spinner" style="width: 12px; height: 12px; margin-right: 6px;"></span>
+                Checking for .rar files...
+              </span>
               <span style="color: var(--border-hover);">|</span>
               <span>AstroNutws/ZYNTH</span>
             </div>
           </div>
           <div class="download-actions">
-            <button class="btn btn-primary btn-large" id="downloadBtnMain">
-              <span>Auto-Download</span>
+            <button class="btn btn-primary btn-large" onclick="handleDownloadClick(event)" id="mainDownloadBtn">
+              <span>Download Latest .rar</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/>
               </svg>
             </button>
             <a href="https://github.com/AstroNutws/ZYNTH/releases" class="btn btn-secondary btn-large" target="_blank" rel="noopener">
-              All Releases
+              View All Releases
             </a>
           </div>
         </div>
@@ -1013,95 +984,160 @@
   </footer>
 
   <script>
-    // GitHub Release API Integration
-    const owner = "AstroNutws";
-    const repo = "ZYNTH";
-    const latestReleaseApi = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
-    let resolvedZipUrl = null;
+    const CONFIG = {
+      owner: "AstroNutws",
+      repo: "ZYNTH",
+      apiUrl: "https://api.github.com/repos/AstroNutws/ZYNTH/releases/latest",
+      downloadUrl: "https://github.com/AstroNutws/ZYNTH/releases"
+    };
 
-    async function resolveLatestZipUrl() {
-      if (resolvedZipUrl) return resolvedZipUrl;
-      const statusEl = document.getElementById("releaseStatus");
+    let latestRarUrl = null;
+    let latestReleaseTag = null;
+    let isFetching = false;
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchLatestRar();
+      setupAnimations();
+      setupSmoothScroll();
+    });
+
+    async function fetchLatestRar() {
+      if (isFetching) return;
+      isFetching = true;
       
+      const statusEl = document.getElementById("releaseStatus");
+      updateStatus(statusEl, 'loading', 'Checking for .rar files...');
+
       try {
-        const response = await fetch(latestReleaseApi, {
+        const response = await fetch(CONFIG.apiUrl, {
           headers: {
-            "Accept": "application/vnd.github+json"
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Zynth-Website"
           }
         });
-        
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        if (!response.ok) {
+          throw new Error(`GitHub API error: ${response.status}`);
+        }
+
         const release = await response.json();
+        latestReleaseTag = release.tag_name;
         
+        // Look specifically for .rar files (case insensitive)
         const assets = release.assets || [];
-        const archiveExts = [".zip", ".dmg", ".exe", ".AppImage", ".tar.gz"];
-        const asset = assets.find(a => 
-          archiveExts.some(ext => a.name.toLowerCase().endsWith(ext))
+        const rarAsset = assets.find(asset => 
+          asset.name.toLowerCase().endsWith('.rar')
         );
 
-        if (asset?.browser_download_url) {
-          resolvedZipUrl = asset.browser_download_url;
-          if (statusEl) {
-            statusEl.innerHTML = `<span style="color: var(--accent);">●</span> ${release.tag_name} ready`;
-          }
-          return resolvedZipUrl;
+        if (rarAsset && rarAsset.browser_download_url) {
+          latestRarUrl = rarAsset.browser_download_url;
+          updateStatus(statusEl, 'success', `${latestReleaseTag} • ${rarAsset.name} ready`);
+          console.log(`Found .rar: ${rarAsset.name} at ${latestRarUrl}`);
+        } else {
+          latestRarUrl = null;
+          updateStatus(statusEl, 'error', 'No .rar file found in latest release');
+          console.log('No .rar asset found in latest release');
         }
-        
-        if (statusEl) statusEl.textContent = "Check GitHub for assets";
-      } catch (err) {
-        console.error("Release fetch failed:", err);
-        if (statusEl) statusEl.textContent = "Check GitHub Releases";
+
+      } catch (error) {
+        console.error("Failed to fetch release:", error);
+        latestRarUrl = null;
+        updateStatus(statusEl, 'error', 'Unable to check releases');
+      } finally {
+        isFetching = false;
       }
-      return null;
     }
 
-    async function startDownload() {
-      const url = await resolveLatestZipUrl();
-      if (!url) {
-        window.open(`https://github.com/${owner}/${repo}/releases`, "_blank");
-        return;
+    function updateStatus(element, state, message) {
+      if (!element) return;
+      
+      element.className = 'status-indicator';
+      if (state === 'error') element.classList.add('error');
+      if (state === 'success') element.classList.add('success');
+      
+      if (state === 'loading') {
+        element.innerHTML = `<span class="spinner" style="width: 12px; height: 12px; margin-right: 6px;"></span> ${message}`;
+      } else {
+        element.textContent = message;
+      }
+    }
+
+    async function handleDownloadClick(event) {
+      event.preventDefault();
+      
+      const btn = event.currentTarget;
+      const originalText = btn.innerHTML;
+      
+      // Show loading state on button
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner"></span> Fetching...`;
+      
+      // If we haven't fetched yet or failed, try again
+      if (!latestRarUrl && !isFetching) {
+        await fetchLatestRar();
       }
       
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "";
-      a.rel = "noopener";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      if (latestRarUrl) {
+        // Create hidden link to trigger download
+        const link = document.createElement('a');
+        link.href = latestRarUrl;
+        link.download = latestRarUrl.split('/').pop() || `Zynth-${latestReleaseTag}.rar`;
+        link.rel = "noopener";
+        link.style.display = 'none';
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        setTimeout(() => {
+          document.body.removeChild(link);
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }, 1000);
+        
+        console.log(`Downloading: ${latestRarUrl}`);
+      } else {
+        // Fallback to releases page
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        window.open(CONFIG.downloadUrl, '_blank');
+      }
     }
 
-    // Event Listeners
-    document.getElementById("downloadBtnMain")?.addEventListener("click", startDownload);
+    function setupAnimations() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = "1";
+            entry.target.style.transform = "translateY(0)";
+          }
+        });
+      }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
-    // Intersection Observer
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = "1";
-          entry.target.style.transform = "translateY(0)";
-        }
+      document.querySelectorAll(".animate-in").forEach(el => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(20px)";
+        el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+        observer.observe(el);
       });
-    }, { threshold: 0.1 });
+    }
 
-    document.querySelectorAll(".animate-in").forEach(el => {
-      el.style.opacity = "0";
-      el.style.transform = "translateY(20px)";
-      el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
-      observer.observe(el);
-    });
-
-    // Smooth scroll
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener("click", function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute("href"));
-        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    function setupSmoothScroll() {
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+          if (this.getAttribute('onclick')) return; // Skip if has onclick handler
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        });
       });
-    });
+    }
 
-    // Initialize
-    resolveLatestZipUrl();
+    // Refresh release data every 5 minutes
+    setInterval(fetchLatestRar, 300000);
   </script>
 </body>
 </html>
