@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zynth</title>
+  <meta name="description" content="Zynth Schema Designer - Visual PostgreSQL and Supabase schema design desktop app.">
+  <link rel="icon" type="image/jpeg" href="logo.jpg">
+  <style>
+    :root {
+      --bg-0: #060d1e;
+      --bg-1: #0c1730;
+      --panel: #101c34;
+      --panel-2: #152648;
+      --text: #eaf2ff;
+      --muted: #9eb4d9;
+      --border: #27426d;
+      --accent: #37b3ff;
+      --accent-2: #7f66ff;
+      --ok: #4fe7a2;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 520px at 8% -10%, #1a3364 0%, transparent 65%),
+        radial-gradient(1000px 500px at 95% 8%, #25215f 0%, transparent 70%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-0));
+      overflow-x: hidden;
+    }
+    .container {
+      width: min(1160px, 92%);
+      margin: 0 auto;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--border);
+      background: rgba(6, 13, 30, 0.78);
+      backdrop-filter: blur(10px);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: .3px;
+    }
+    .brand img {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: rgba(14, 28, 53, 0.72);
+      border: 1px solid var(--border);
+      padding: 6px;
+      border-radius: 12px;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      padding: 9px 10px;
+      border-radius: 8px;
+      transition: background-color .2s ease, color .2s ease;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      background: rgba(87, 131, 220, 0.16);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      transition: .2s transform ease, .2s filter ease, .2s border-color ease;
+      cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
+    .btn:active { transform: translateY(0); }
+    .btn-main {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 26px rgba(87, 134, 255, 0.35);
+      border-color: rgba(152, 194, 255, 0.3);
+    }
+    .btn-ghost {
+      background: #14233f;
+      border-color: var(--border);
+      color: var(--text);
+    }
+    .hero {
+      padding: 74px 0 52px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 26px;
+      align-items: center;
+    }
+    .hero h1 {
+      margin: 0 0 16px;
+      font-size: clamp(34px, 6vw, 58px);
+      line-height: 1.08;
+      letter-spacing: -0.4px;
+    }
+    .hero p {
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.75;
+      font-size: 16px;
+      max-width: 66ch;
+    }
+    .open-source-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid #2f4f82;
+      background: rgba(58, 96, 172, 0.2);
+      color: #b8cdf2;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+    }
+    .hero-actions {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .hero-card {
+      background: linear-gradient(180deg, var(--panel-2), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      transform: translateY(0);
+      animation: floatCard 6s ease-in-out infinite;
+    }
+    .hero-card h3 {
+      margin: 0 0 10px;
+      font-size: 17px;
+    }
+    .hero-card ul {
+      margin: 0;
+      padding-left: 18px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+    .status {
+      margin-top: 14px;
+      color: var(--ok);
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .section {
+      padding: 22px 0 30px;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: .55s ease;
+    }
+    .section.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 31px;
+      letter-spacing: -0.2px;
+    }
+    .section .lead {
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.72;
+      max-width: 78ch;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #142646, #101d36);
+      padding: 16px;
+    }
+    .card h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.62;
+    }
+    .deep-copy {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .copy-box {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #101d36;
+      padding: 16px;
+    }
+    .copy-box h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .copy-box p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .shots {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .shot {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #101d36;
+      box-shadow: var(--shadow);
+    }
+    .shot img {
+      width: 100%;
+      display: block;
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+      background: #0c1630;
+    }
+    .shot figcaption {
+      margin: 0;
+      padding: 10px 12px 12px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .download-panel {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #17305a, #122544);
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+    }
+    .download-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .small {
+      margin-top: 8px;
+      color: #8ea9d8;
+      font-size: 13px;
+    }
+    footer {
+      margin-top: 30px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+      padding: 18px 0 28px;
+      text-align: center;
+    }
+    @keyframes floatCard {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    @media (max-width: 980px) {
+      .hero,
+      .deep-copy,
+      .shots,
+      .download-panel {
+        grid-template-columns: 1fr;
+      }
+      .grid-3 { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#top">
+        <img src="logo.jpg" alt="Zynth logo">
+        <span>Zynth</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#snapshots">Snapshots</a>
+        <a href="#download">Download</a>
+        <a href="#contact">Contact</a>
+        <a href="https://github.com/AstroNutws/ZYNTH/tree/main">Open Source</a>
+        <a class="btn btn-main" href="#" id="downloadBtnTop">Auto Download .zip</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top" class="container">
+    <section class="hero section show">
+      <div>
+        <div class="open-source-badge">Open Source • MIT Licensed</div>
+        <h1>Schema design that feels visual, fast, and production-ready.</h1>
+        <p>
+          Zynth is a desktop schema designer for PostgreSQL and Supabase that helps teams move from rough ideas to
+          real database structures without losing accuracy. You can model tables and relationships visually, edit constraints
+          from a focused properties panel, and generate SQL or Prisma code in real-time.
+        </p>
+        <p>
+          The goal is simple: reduce friction between planning, implementation, and deployment so you can ship faster with
+          fewer schema mistakes.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-main" href="#" id="downloadBtnHero">Download Latest .zip</a>
+          <a class="btn btn-ghost" href="https://github.com/AstroNutws/ZYNTH/tree/main">View Repository</a>
+        </div>
+        <div class="status" id="releaseStatus">Resolving latest release asset...</div>
+      </div>
+      <aside class="hero-card">
+        <h3>Who this is for</h3>
+        <ul>
+          <li>Developers learning relational modeling through visual feedback</li>
+          <li>Startup teams rapidly iterating product schemas</li>
+          <li>Backend engineers who need accurate SQL/Prisma output</li>
+          <li>Supabase users who want import + apply workflows in one desktop tool</li>
+          <li>Teams that review schema design before migration rollout</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section id="about" class="section">
+      <h2>What Zynth is all about</h2>
+      <p class="lead">
+        Most schema workflows are split across whiteboards, SQL files, and DB consoles. Zynth unifies those pieces into one
+        interface: visual modeling, detail editing, and generation pipelines all connected in a single desktop app.
+      </p>
+      <div class="deep-copy">
+        <article class="copy-box">
+          <h3>From idea to structure</h3>
+          <p>
+            Start from a blank schema or imported database, add tables with non-overlap placement, define keys and constraints,
+            then see relationships and dependencies clearly. This reduces ambiguity early and helps prevent migration rework.
+          </p>
+        </article>
+        <article class="copy-box">
+          <h3>From structure to deployment</h3>
+          <p>
+            Generate SQL/Prisma output live as you model. Optionally connect to PostgreSQL or Supabase to import existing schema
+            state, scope by schema, and apply generated SQL with deliberate control.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section id="features" class="section">
+      <h2>Core features</h2>
+      <div class="grid-3">
+        <article class="card">
+          <h3>Visual canvas</h3>
+          <p>Drag tables, inspect relationship flow, and keep diagrams readable with spacing-aware placement and centering tools.</p>
+        </article>
+        <article class="card">
+          <h3>Rich column modeling</h3>
+          <p>Configure datatype, PK, unique, nullable, default, ENUM values, and foreign-key target from the properties panel.</p>
+        </article>
+        <article class="card">
+          <h3>Realtime generation</h3>
+          <p>Keep SQL, Prisma, and migration diff views synced to your current schema so code output is always up-to-date.</p>
+        </article>
+        <article class="card">
+          <h3>DB-connected workflow</h3>
+          <p>Connect to PostgreSQL/Supabase, import a schema, and apply generated statements without leaving the app.</p>
+        </article>
+        <article class="card">
+          <h3>Team iteration</h3>
+          <p>Use save/load with `.zynth` project files for handoff, review cycles, and reproducible schema planning sessions.</p>
+        </article>
+        <article class="card">
+          <h3>Keyboard + navigation support</h3>
+          <p>Undo/redo, reset view, center selected table, and efficient pan/zoom controls to keep editing flow fast.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="snapshots" class="section">
+      <h2>Snapshots</h2>
+      <p class="lead">
+        Real product snapshots from Zynth in action.
+      </p>
+      <div class="shots">
+        <figure class="shot">
+          <img src="snap1.jpg" alt="Zynth app snapshot 1">
+          <figcaption>Snapshot 1</figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="snap2.jpg" alt="Zynth app snapshot 2">
+          <figcaption>Snapshot 2</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="download" class="section">
+      <h2>Download latest release</h2>
+      <div class="download-panel">
+        <div>
+          <p>
+            Click auto-download and this page will detect the latest release `.zip` asset from GitHub and start the download.
+            If there is no `.zip` asset yet, it will send users to the latest release page as fallback.
+          </p>
+          <div class="small">
+            Source: GitHub Releases API for `AstroNutws/ZYNTH`
+          </div>
+        </div>
+        <div>
+          <a class="btn btn-main" href="#" id="downloadBtnBottom">Auto Download .zip</a>
+          <a class="btn btn-ghost" href="https://github.com/AstroNutws/ZYNTH/releases/latest">Open Releases</a>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <h2>Contact</h2>
+      <div class="download-panel">
+        <div>
+          <p>
+            Have suggestions, feedback, feature ideas, or found a bug? Send a message anytime.
+          </p>
+          <div class="small">
+            Your feedback helps improve Zynth for everyone.
+          </div>
+        </div>
+        <div>
+          <a class="btn btn-main" href="mailto:samongud@gmail.com?subject=Zynth%20Suggestion">Contact Developer</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      Zynth • Visual PostgreSQL and Supabase schema workflow tool
+    </div>
+  </footer>
+
+  <script>
+    const owner = "AstroNutws";
+    const repo = "ZYNTH";
+    const latestReleaseApi = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
+    let resolvedZipUrl = null;
+
+    async function resolveLatestZipUrl() {
+      if (resolvedZipUrl) return resolvedZipUrl;
+      const status = document.getElementById("releaseStatus");
+      try {
+        const response = await fetch(latestReleaseApi, { headers: { "Accept": "application/vnd.github+json" } });
+        if (!response.ok) throw new Error(`release lookup failed (${response.status})`);
+        const release = await response.json();
+        const assets = Array.isArray(release.assets) ? release.assets : [];
+        const archiveExt = [".zip", ".rar", ".7z"];
+        const archiveAsset = assets.find(a =>
+          typeof a.name === "string" &&
+          archiveExt.some(ext => a.name.toLowerCase().endsWith(ext))
+        );
+        if (archiveAsset && archiveAsset.browser_download_url) {
+          resolvedZipUrl = archiveAsset.browser_download_url;
+          if (status) status.textContent = `Latest: ${release.tag_name || "release"} • Ready to download ${archiveAsset.name}`;
+          return resolvedZipUrl;
+        }
+        if (status) status.textContent = "No compressed archive (.zip/.rar/.7z) found on the latest release yet.";
+      } catch (err) {
+        if (status) status.textContent = "Could not resolve the latest archive right now.";
+      }
+      resolvedZipUrl = null;
+      return null;
+    }
+
+    async function startAutoDownload() {
+      const url = await resolveLatestZipUrl();
+      if (!url) {
+        alert("Latest archive is not available yet. Please upload a .zip, .rar, or .7z asset to the latest GitHub release.");
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "";
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    function bindDownloadButtons() {
+      ["downloadBtnTop", "downloadBtnHero", "downloadBtnBottom"].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener("click", (e) => {
+          e.preventDefault();
+          startAutoDownload();
+        });
+      });
+    }
+
+    function setupRevealAnimations() {
+      const sections = [...document.querySelectorAll(".section")];
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) entry.target.classList.add("show");
+        });
+      }, { threshold: 0.12 });
+      sections.forEach(section => observer.observe(section));
+    }
+
+    function maybeAutoDownloadFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("download") === "1") {
+        startAutoDownload();
+      }
+    }
+
+    (async function init() {
+      bindDownloadButtons();
+      setupRevealAnimations();
+      await resolveLatestZipUrl();
+      maybeAutoDownloadFromQuery();
+    })();
+  </script>
+</body>
+</html>
