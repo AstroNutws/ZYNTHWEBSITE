@@ -1,483 +1,1019 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Zynth</title>
-  <meta name="description" content="Zynth Schema Designer - Visual PostgreSQL and Supabase schema design desktop app.">
+  <title>Zynth — Schema Designer for PostgreSQL</title>
+  <meta name="description" content="Visual PostgreSQL and Supabase schema design tool. Generate SQL and Prisma code in real-time.">
   <link rel="icon" type="image/jpeg" href="logo.jpg">
   <style>
     :root {
-      --bg-0: #060d1e;
-      --bg-1: #0c1730;
-      --panel: #101c34;
-      --panel-2: #152648;
-      --text: #eaf2ff;
-      --muted: #9eb4d9;
-      --border: #27426d;
-      --accent: #37b3ff;
-      --accent-2: #7f66ff;
-      --ok: #4fe7a2;
-      --shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      /* Matching Zynth App Color Palette */
+      --bg-canvas: #0b1120;
+      --bg-primary: #0f172a;
+      --bg-secondary: #111827;
+      --bg-tertiary: #1e293b;
+      --bg-elevated: #1e293b;
+      --bg-card: #1e293b;
+      
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-tertiary: #64748b;
+      --text-muted: #475569;
+      
+      --border-subtle: #1e293b;
+      --border-default: #334155;
+      --border-hover: #475569;
+      
+      --accent: #06b6d4;
+      --accent-hover: #22d3ee;
+      --accent-dim: rgba(6, 182, 212, 0.1);
+      --accent-glow: rgba(6, 182, 212, 0.4);
+      
+      --grid-color: #1e293b;
+      
+      --font-sans: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, monospace;
+      
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0;
+    }
+
+    html { 
+      background: var(--bg-canvas);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
     body {
-      margin: 0;
-      font-family: "Segoe UI", Inter, Arial, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(1200px 520px at 8% -10%, #1a3364 0%, transparent 65%),
-        radial-gradient(1000px 500px at 95% 8%, #25215f 0%, transparent 70%),
-        linear-gradient(180deg, var(--bg-1), var(--bg-0));
-      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
+
+    /* Grid pattern overlay like the app canvas */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: 0;
+      background-image: 
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      color: var(--text-primary);
+    }
+
+    h1 { font-size: clamp(2.5rem, 5vw, 3.5rem); }
+    h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
+    h3 { font-size: 1.125rem; }
+
+    p {
+      color: var(--text-secondary);
+      max-width: 65ch;
+      line-height: 1.7;
+    }
+
+    /* Layout */
     .container {
-      width: min(1160px, 92%);
+      width: 100%;
+      max-width: 1200px;
       margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
     }
+
+    /* Header - App-style dark navy */
     header {
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 1px solid var(--border);
-      background: rgba(6, 13, 30, 0.78);
-      backdrop-filter: blur(10px);
+      background: var(--bg-primary);
+      border-bottom: 1px solid var(--border-default);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
+
     .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 10px 0;
+      height: 64px;
     }
+
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       text-decoration: none;
-      color: var(--text);
-      font-weight: 800;
-      letter-spacing: .3px;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 1.125rem;
+      transition: opacity 0.2s ease;
     }
+
+    .brand:hover { opacity: 0.8; }
+    
     .brand img {
-      width: 38px;
-      height: 38px;
-      border-radius: 10px;
-      object-fit: cover;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border-default);
+      background: var(--bg-secondary);
     }
+
     .nav-links {
       display: flex;
-      gap: 10px;
       align-items: center;
-      background: rgba(14, 28, 53, 0.72);
-      border: 1px solid var(--border);
-      padding: 6px;
-      border-radius: 12px;
+      gap: 32px;
     }
+
     .nav-links a {
-      color: var(--muted);
+      color: var(--text-secondary);
       text-decoration: none;
-      font-size: 13px;
-      padding: 9px 10px;
-      border-radius: 8px;
-      transition: background-color .2s ease, color .2s ease;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+      position: relative;
     }
+
     .nav-links a:hover {
-      color: var(--text);
-      background: rgba(87, 131, 220, 0.16);
+      color: var(--text-primary);
     }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s var(--ease-out-expo);
+      border-radius: 2px;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Buttons - Cyan accent like the app */
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      padding: 11px 16px;
-      border-radius: 12px;
-      border: 1px solid transparent;
-      color: #fff;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 500;
       text-decoration: none;
-      font-weight: 700;
-      transition: .2s transform ease, .2s filter ease, .2s border-color ease;
+      transition: all 0.2s var(--ease-out-expo);
       cursor: pointer;
+      border: 1px solid transparent;
     }
-    .btn:hover { transform: translateY(-1px); filter: brightness(1.08); }
-    .btn:active { transform: translateY(0); }
-    .btn-main {
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      box-shadow: 0 10px 26px rgba(87, 134, 255, 0.35);
-      border-color: rgba(152, 194, 255, 0.3);
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      font-weight: 600;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
     }
-    .btn-ghost {
-      background: #14233f;
-      border-color: var(--border);
-      color: var(--text);
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
     }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border-color: var(--border-default);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--bg-secondary);
+    }
+
+    .btn-large {
+      padding: 12px 24px;
+      font-size: 0.9375rem;
+    }
+
+    /* Hero Section */
     .hero {
-      padding: 74px 0 52px;
+      padding: 100px 0 80px;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 0%, rgba(6, 182, 212, 0.08), transparent 50%);
+    }
+
+    .hero-grid {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 26px;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
       align-items: center;
     }
-    .hero h1 {
-      margin: 0 0 16px;
-      font-size: clamp(34px, 6vw, 58px);
-      line-height: 1.08;
-      letter-spacing: -0.4px;
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
-    .hero p {
-      margin: 0 0 12px;
-      color: var(--muted);
-      line-height: 1.75;
-      font-size: 16px;
-      max-width: 66ch;
-    }
-    .open-source-badge {
+
+    .badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin: 0 0 12px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid #2f4f82;
-      background: rgba(58, 96, 172, 0.2);
-      color: #b8cdf2;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .3px;
+      padding: 6px 12px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      width: fit-content;
+      font-family: var(--font-mono);
     }
+
+    .badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .hero h1 {
+      color: var(--text-primary);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .hero-description {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+    }
+
     .hero-actions {
-      margin-top: 20px;
       display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
+      gap: 12px;
+      margin-top: 8px;
     }
-    .hero-card {
-      background: linear-gradient(180deg, var(--panel-2), var(--panel));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      box-shadow: var(--shadow);
-      transform: translateY(0);
-      animation: floatCard 6s ease-in-out infinite;
+
+    /* Hero Visual - Schema table cards like the app */
+    .hero-visual {
+      position: relative;
+      aspect-ratio: 4/3;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
-    .hero-card h3 {
-      margin: 0 0 10px;
-      font-size: 17px;
+
+    .schema-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.6;
     }
-    .hero-card ul {
-      margin: 0;
-      padding-left: 18px;
-      line-height: 1.7;
-      color: var(--muted);
+
+    .floating-card {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      min-width: 200px;
+      animation: float 6s ease-in-out infinite;
     }
-    .status {
-      margin-top: 14px;
-      color: var(--ok);
-      font-size: 14px;
+
+    .floating-card:nth-child(2) {
+      top: 20%;
+      left: 15%;
+      animation-delay: -2s;
+    }
+
+    .floating-card:nth-child(3) {
+      top: 50%;
+      right: 10%;
+      animation-delay: -4s;
+      border-color: var(--accent);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .card-header {
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
       font-weight: 600;
     }
-    .section {
-      padding: 22px 0 30px;
-      opacity: 0;
-      transform: translateY(16px);
-      transition: .55s ease;
+
+    .card-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
     }
-    .section.show {
-      opacity: 1;
-      transform: translateY(0);
+
+    .key {
+      color: var(--text-secondary);
     }
-    .section h2 {
-      margin: 0 0 14px;
-      font-size: 31px;
-      letter-spacing: -0.2px;
+
+    .type {
+      color: var(--text-tertiary);
+      font-size: 0.75rem;
     }
-    .section .lead {
-      margin: 0 0 16px;
-      color: var(--muted);
-      line-height: 1.72;
-      max-width: 78ch;
+
+    .pk {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.7rem;
+      margin-right: 4px;
     }
-    .grid-3 {
+
+    /* Sections */
+    section {
+      padding: 80px 0;
+      position: relative;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-header h2 {
+      margin-bottom: 12px;
+    }
+
+    .section-header p {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+    }
+
+    /* Features Grid - App panel style */
+    .features-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-    }
-    .card {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: linear-gradient(180deg, #142646, #101d36);
-      padding: 16px;
-    }
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 18px;
-    }
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.62;
-    }
-    .deep-copy {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .copy-box {
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      background: #101d36;
-      padding: 16px;
-    }
-    .copy-box h3 {
-      margin: 0 0 8px;
-      font-size: 18px;
-    }
-    .copy-box p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.75;
-    }
-    .shots {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-    .shot {
-      border: 1px solid var(--border);
-      border-radius: 14px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border-default);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
       overflow: hidden;
-      background: #101d36;
-      box-shadow: var(--shadow);
     }
+
+    .feature-card {
+      background: var(--bg-secondary);
+      padding: 32px;
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      margin-bottom: 16px;
+      font-size: 1.25rem;
+      color: var(--accent);
+    }
+
+    .feature-card h3 {
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      margin: 0;
+      color: var(--text-secondary);
+    }
+
+    /* Split Layout */
+    .split-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .copy-block {
+      padding: 32px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      position: relative;
+    }
+
+    .copy-block:hover {
+      border-color: var(--border-hover);
+    }
+
+    .copy-block h3 {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.125rem;
+    }
+
+    .step-number {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 700;
+      background: var(--accent-dim);
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    .copy-block p {
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    /* Snapshots */
+    .shots-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .shot {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-default);
+      background: var(--bg-secondary);
+      transition: all 0.3s var(--ease-out-expo);
+    }
+
+    .shot:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
     .shot img {
       width: 100%;
-      display: block;
-      aspect-ratio: 16 / 10;
+      aspect-ratio: 16/10;
       object-fit: cover;
-      background: #0c1630;
+      display: block;
+      border-bottom: 1px solid var(--border-default);
     }
-    .shot figcaption {
-      margin: 0;
-      padding: 10px 12px 12px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .download-panel {
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: linear-gradient(180deg, #17305a, #122544);
+
+    .shot-caption {
       padding: 20px;
-      display: grid;
-      grid-template-columns: 1fr auto;
+      background: var(--bg-secondary);
+    }
+
+    .shot-caption h4 {
+      font-size: 1rem;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .shot-caption p {
+      font-size: 0.875rem;
+      margin: 0;
+      color: var(--text-tertiary);
+    }
+
+    /* Download Section - App panel style */
+    .download-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 48px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .download-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    .download-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .download-content h2 {
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .download-content p {
+      margin-bottom: 24px;
+      max-width: 50ch;
+      color: var(--text-secondary);
+    }
+
+    .download-meta {
+      display: flex;
+      align-items: center;
       gap: 16px;
+      margin-top: 16px;
+      font-size: 0.8125rem;
+      color: var(--text-tertiary);
+      font-family: var(--font-mono);
+    }
+
+    .status-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-secondary);
+    }
+
+    .status-indicator::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .download-actions {
+      display: flex;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Contact Section */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .contact-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .contact-card h3 {
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .contact-card p {
+      margin-bottom: 24px;
+      font-size: 0.9375rem;
+      color: var(--text-secondary);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      background: var(--bg-primary);
+      border-top: 1px solid var(--border-default);
+      padding: 32px 0;
+      color: var(--text-tertiary);
+      font-size: 0.875rem;
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
     }
-    .download-panel p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.7;
+
+    .footer-links {
+      display: flex;
+      gap: 24px;
     }
-    .small {
-      margin-top: 8px;
-      color: #8ea9d8;
-      font-size: 13px;
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s ease;
     }
-    footer {
-      margin-top: 30px;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 14px;
-      padding: 18px 0 28px;
-      text-align: center;
+
+    .footer-links a:hover {
+      color: var(--accent);
     }
-    @keyframes floatCard {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    @media (max-width: 980px) {
-      .hero,
-      .deep-copy,
-      .shots,
-      .download-panel {
+
+    .animate-in {
+      animation: fadeIn 0.8s var(--ease-out-expo) forwards;
+      opacity: 0;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+
+    /* Scrollbar - App style */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-default);
+      border-radius: 5px;
+      border: 2px solid var(--bg-primary);
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border-hover);
+    }
+
+    /* Responsive */
+    @media (max-width: 968px) {
+      .hero-grid,
+      .split-layout,
+      .contact-grid {
         grid-template-columns: 1fr;
       }
-      .grid-3 { grid-template-columns: 1fr; }
-      .nav-links { display: none; }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: 60px 0 40px;
+      }
+
+      .hero-visual {
+        aspect-ratio: 16/10;
+      }
+
+      .download-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 32px;
+      }
+
+      .download-actions {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .floating-card {
+        min-width: 150px;
+        padding: 12px;
+      }
+    }
+
+    @media (min-width: 969px) {
+      .mobile-menu-btn { display: none; }
+    }
+
+    .mobile-menu-btn {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 8px;
     }
   </style>
+<base target="_blank">
 </head>
 <body>
+
   <header>
     <div class="container nav">
       <a class="brand" href="#top">
-        <img src="logo.jpg" alt="Zynth logo">
+        <img src="logo.jpg" alt="Zynth">
         <span>Zynth</span>
       </a>
+      
       <nav class="nav-links">
         <a href="#about">About</a>
         <a href="#features">Features</a>
         <a href="#snapshots">Snapshots</a>
         <a href="#download">Download</a>
         <a href="#contact">Contact</a>
-        <a href="https://github.com/AstroNutws/ZYNTH/tree/main">Open Source</a>
-        <a class="btn btn-main" href="#" id="downloadBtnTop">Auto Download .zip</a>
+        <a href="https://github.com/AstroNutws/ZYNTH" target="_blank" rel="noopener">GitHub</a>
+        <a href="#download" class="btn btn-primary">Download</a>
       </nav>
+
+      <button class="mobile-menu-btn" aria-label="Menu">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 12h18M3 6h18M3 18h18"/>
+        </svg>
+      </button>
     </div>
   </header>
 
-  <main id="top" class="container">
-    <section class="hero section show">
-      <div>
-        <div class="open-source-badge">Open Source • MIT Licensed</div>
-        <h1>Schema design that feels visual, fast, and production-ready.</h1>
-        <p>
-          Zynth is a desktop schema designer for PostgreSQL and Supabase that helps teams move from rough ideas to
-          real database structures without losing accuracy. You can model tables and relationships visually, edit constraints
-          from a focused properties panel, and generate SQL or Prisma code in real-time.
-        </p>
-        <p>
-          The goal is simple: reduce friction between planning, implementation, and deployment so you can ship faster with
-          fewer schema mistakes.
-        </p>
-        <div class="hero-actions">
-          <a class="btn btn-main" href="#" id="downloadBtnHero">Download Latest .zip</a>
-          <a class="btn btn-ghost" href="https://github.com/AstroNutws/ZYNTH/tree/main">View Repository</a>
-        </div>
-        <div class="status" id="releaseStatus">Resolving latest release asset...</div>
-      </div>
-      <aside class="hero-card">
-        <h3>Who this is for</h3>
-        <ul>
-          <li>Developers learning relational modeling through visual feedback</li>
-          <li>Startup teams rapidly iterating product schemas</li>
-          <li>Backend engineers who need accurate SQL/Prisma output</li>
-          <li>Supabase users who want import + apply workflows in one desktop tool</li>
-          <li>Teams that review schema design before migration rollout</li>
-        </ul>
-      </aside>
-    </section>
-
-    <section id="about" class="section">
-      <h2>What Zynth is all about</h2>
-      <p class="lead">
-        Most schema workflows are split across whiteboards, SQL files, and DB consoles. Zynth unifies those pieces into one
-        interface: visual modeling, detail editing, and generation pipelines all connected in a single desktop app.
-      </p>
-      <div class="deep-copy">
-        <article class="copy-box">
-          <h3>From idea to structure</h3>
-          <p>
-            Start from a blank schema or imported database, add tables with non-overlap placement, define keys and constraints,
-            then see relationships and dependencies clearly. This reduces ambiguity early and helps prevent migration rework.
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-content animate-in">
+          <div class="badge">Open Source • MIT License</div>
+          <h1>Schema design for PostgreSQL, without the friction.</h1>
+          <p class="hero-description">
+            A visual designer for PostgreSQL and Supabase. Model tables, relationships, and constraints 
+            with precision. Generate SQL and Prisma code in real-time. From idea to production-ready 
+            structure, without losing accuracy.
           </p>
-        </article>
-        <article class="copy-box">
-          <h3>From structure to deployment</h3>
-          <p>
-            Generate SQL/Prisma output live as you model. Optionally connect to PostgreSQL or Supabase to import existing schema
-            state, scope by schema, and apply generated SQL with deliberate control.
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <section id="features" class="section">
-      <h2>Core features</h2>
-      <div class="grid-3">
-        <article class="card">
-          <h3>Visual canvas</h3>
-          <p>Drag tables, inspect relationship flow, and keep diagrams readable with spacing-aware placement and centering tools.</p>
-        </article>
-        <article class="card">
-          <h3>Rich column modeling</h3>
-          <p>Configure datatype, PK, unique, nullable, default, ENUM values, and foreign-key target from the properties panel.</p>
-        </article>
-        <article class="card">
-          <h3>Realtime generation</h3>
-          <p>Keep SQL, Prisma, and migration diff views synced to your current schema so code output is always up-to-date.</p>
-        </article>
-        <article class="card">
-          <h3>DB-connected workflow</h3>
-          <p>Connect to PostgreSQL/Supabase, import a schema, and apply generated statements without leaving the app.</p>
-        </article>
-        <article class="card">
-          <h3>Team iteration</h3>
-          <p>Use save/load with `.zynth` project files for handoff, review cycles, and reproducible schema planning sessions.</p>
-        </article>
-        <article class="card">
-          <h3>Keyboard + navigation support</h3>
-          <p>Undo/redo, reset view, center selected table, and efficient pan/zoom controls to keep editing flow fast.</p>
-        </article>
-      </div>
-    </section>
-
-    <section id="snapshots" class="section">
-      <h2>Snapshots</h2>
-      <p class="lead">
-        Real product snapshots from Zynth in action.
-      </p>
-      <div class="shots">
-        <figure class="shot">
-          <img src="snap1.jpg" alt="Zynth app snapshot 1">
-          <figcaption>Snapshot 1</figcaption>
-        </figure>
-        <figure class="shot">
-          <img src="snap2.jpg" alt="Zynth app snapshot 2">
-          <figcaption>Snapshot 2</figcaption>
-        </figure>
-      </div>
-    </section>
-
-    <section id="download" class="section">
-      <h2>Download latest release</h2>
-      <div class="download-panel">
-        <div>
-          <p>
-            Click auto-download and this page will detect the latest release `.zip` asset from GitHub and start the download.
-            If there is no `.zip` asset yet, it will send users to the latest release page as fallback.
-          </p>
-          <div class="small">
-            Source: GitHub Releases API for `AstroNutws/ZYNTH`
+          <div class="hero-actions">
+            <a href="#download" class="btn btn-primary btn-large">
+              Download Latest
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/>
+              </svg>
+            </a>
+            <a href="https://github.com/AstroNutws/ZYNTH" class="btn btn-secondary btn-large" target="_blank" rel="noopener">
+              View Source
+            </a>
           </div>
         </div>
-        <div>
-          <a class="btn btn-main" href="#" id="downloadBtnBottom">Auto Download .zip</a>
-          <a class="btn btn-ghost" href="https://github.com/AstroNutws/ZYNTH/releases/latest">Open Releases</a>
+
+        <div class="hero-visual animate-in delay-1">
+          <div class="schema-grid"></div>
+          
+          <div class="floating-card">
+            <div class="card-header">public.users</div>
+            <div class="card-row">
+              <span><span class="pk">PK</span><span class="key">id</span></span>
+              <span class="type">UUID</span>
+            </div>
+            <div class="card-row">
+              <span><span class="key">email</span></span>
+              <span class="type">VARCHAR</span>
+            </div>
+            <div class="card-row">
+              <span><span class="key">created_at</span></span>
+              <span class="type">TIMESTAMPTZ</span>
+            </div>
+          </div>
+
+          <div class="floating-card">
+            <div class="card-header">public.posts</div>
+            <div class="card-row">
+              <span><span class="pk">PK</span><span class="key">id</span></span>
+              <span class="type">BIGSERIAL</span>
+            </div>
+            <div class="card-row">
+              <span><span class="key">user_id</span></span>
+              <span class="type">UUID → users</span>
+            </div>
+            <div class="card-row">
+              <span><span class="key">title</span></span>
+              <span class="type">TEXT</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <section id="contact" class="section">
-      <h2>Contact</h2>
-      <div class="download-panel">
-        <div>
-          <p>
-            Have suggestions, feedback, feature ideas, or found a bug? Send a message anytime.
-          </p>
-          <div class="small">
-            Your feedback helps improve Zynth for everyone.
+    <section id="about">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>Design-first database modeling</h2>
+          <p>Most schema workflows are split across whiteboards, SQL files, and database consoles. 
+          Zynth unifies visual modeling, constraint editing, and code generation into a single, 
+          deliberate interface.</p>
+        </div>
+
+        <div class="split-layout">
+          <article class="copy-block animate-in delay-1">
+            <h3><span class="step-number">01</span> From idea to structure</h3>
+            <p>Start from a blank canvas or import an existing database. Place tables with intelligent 
+            non-overlap positioning. Define primary keys, foreign relationships, and constraints through 
+            a focused properties panel. See dependencies clearly, reduce ambiguity early.</p>
+          </article>
+
+          <article class="copy-block animate-in delay-2">
+            <h3><span class="step-number">02</span> From structure to deployment</h3>
+            <p>Generate SQL DDL and Prisma schemas in real-time as you model. Connect directly to 
+            PostgreSQL or Supabase to import existing schema state, preview migrations, and apply 
+            changes with deliberate control.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" style="background: var(--bg-primary); border-top: 1px solid var(--border-default); border-bottom: 1px solid var(--border-default);">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>Capabilities</h2>
+          <p>Everything you need to design, validate, and deploy database schemas.</p>
+        </div>
+
+        <div class="features-grid animate-in delay-1">
+          <article class="feature-card">
+            <div class="feature-icon">◈</div>
+            <h3>Visual Canvas</h3>
+            <p>Infinite canvas with drag-and-drop table positioning. Relationship routing keeps diagrams readable as complexity grows.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">⚏</div>
+            <h3>Rich Modeling</h3>
+            <p>Configure datatypes, constraints, defaults, and ENUMs. Foreign key targeting with visual connection lines.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">⌘</div>
+            <h3>Live Generation</h3>
+            <p>Keep SQL, Prisma, and migration diffs synced to your model. Export production-ready code instantly.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">▣</div>
+            <h3>Database Sync</h3>
+            <p>Connect to PostgreSQL or Supabase. Import existing schemas, scope by namespace, apply SQL directly.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">◫</div>
+            <h3>Project Files</h3>
+            <p>Save and load .zynth project files for version control, team handoff, and reproducible planning sessions.</p>
+          </article>
+
+          <article class="feature-card">
+            <div class="feature-icon">⌥</div>
+            <h3>Keyboard First</h3>
+            <p>Undo/redo, center view, quick zoom, and efficient navigation. Stay in flow without reaching for the mouse.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="snapshots">
+      <div class="container">
+        <div class="section-header animate-in">
+          <h2>Snapshots</h2>
+          <p>Interface details from the design workflow.</p>
+        </div>
+
+        <div class="shots-grid">
+          <figure class="shot animate-in delay-1">
+            <img src="snap1.jpg" alt="Schema visualization interface showing public.users and public.posts tables" loading="lazy">
+            <div class="shot-caption">
+              <h4>Visual Schema Mapping</h4>
+              <p>Table relationships and constraint visualization with grid canvas</p>
+            </div>
+          </figure>
+
+          <figure class="shot animate-in delay-2">
+            <img src="snap2.jpg" alt="Code generation panel" loading="lazy">
+            <div class="shot-caption">
+              <h4>Properties Panel</h4>
+              <p>Column configuration and relationship management</p>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="download">
+      <div class="container">
+        <div class="download-card animate-in">
+          <div class="download-content">
+            <h2>Download Zynth</h2>
+            <p>Latest release available for macOS, Windows, and Linux. Automatic updates via GitHub Releases. 
+            Free and open source under MIT license.</p>
+            <div class="download-meta">
+              <span class="status-indicator" id="releaseStatus">Resolving latest release...</span>
+              <span style="color: var(--border-hover);">|</span>
+              <span>AstroNutws/ZYNTH</span>
+            </div>
+          </div>
+          <div class="download-actions">
+            <button class="btn btn-primary btn-large" id="downloadBtnMain">
+              <span>Auto-Download</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M12 15V3m0 12-4-4m4 4 4-4M2 17l.621 2.485A2 2 0 0 0 4.561 21h14.878a2 2 0 0 0 1.94-1.515L22 17"/>
+              </svg>
+            </button>
+            <a href="https://github.com/AstroNutws/ZYNTH/releases" class="btn btn-secondary btn-large" target="_blank" rel="noopener">
+              All Releases
+            </a>
           </div>
         </div>
-        <div>
-          <a class="btn btn-main" href="mailto:samongud@gmail.com?subject=Zynth%20Suggestion">Contact Developer</a>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="contact-grid">
+          <div class="contact-card animate-in">
+            <h3>Feedback & Contributions</h3>
+            <p>Found a bug? Have a feature request? Contributions are welcome on GitHub. 
+            For private inquiries or security issues, email directly.</p>
+            <a href="mailto:samongud@gmail.com?subject=Zynth%20Feedback" class="btn btn-primary">
+              Contact Developer
+            </a>
+          </div>
+
+          <div class="contact-card animate-in delay-1" style="background: var(--bg-tertiary); border-color: var(--accent); border-width: 1px;">
+            <h3 style="color: var(--accent);">Open Source</h3>
+            <p style="color: var(--text-secondary);">Built by the community, for the community. Star the repo to support the project.</p>
+            <a href="https://github.com/AstroNutws/ZYNTH" class="btn btn-secondary" style="border-color: var(--accent); color: var(--accent);" target="_blank" rel="noopener">
+              Star on GitHub
+            </a>
+          </div>
         </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <div class="container">
-      Zynth • Visual PostgreSQL and Supabase schema workflow tool
+    <div class="container footer-content">
+      <div>© 2026 Zynth. MIT License.</div>
+      <div class="footer-links">
+        <a href="https://github.com/AstroNutws/ZYNTH" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/AstroNutws/ZYNTH/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="mailto:samongud@gmail.com">Contact</a>
+      </div>
     </div>
   </footer>
 
   <script>
+    // GitHub Release API Integration
     const owner = "AstroNutws";
     const repo = "ZYNTH";
     const latestReleaseApi = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
@@ -485,36 +1021,47 @@
 
     async function resolveLatestZipUrl() {
       if (resolvedZipUrl) return resolvedZipUrl;
-      const status = document.getElementById("releaseStatus");
+      const statusEl = document.getElementById("releaseStatus");
+      
       try {
-        const response = await fetch(latestReleaseApi, { headers: { "Accept": "application/vnd.github+json" } });
-        if (!response.ok) throw new Error(`release lookup failed (${response.status})`);
+        const response = await fetch(latestReleaseApi, {
+          headers: {
+            "Accept": "application/vnd.github+json"
+          }
+        });
+        
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const release = await response.json();
-        const assets = Array.isArray(release.assets) ? release.assets : [];
-        const archiveExt = [".zip", ".rar", ".7z"];
-        const archiveAsset = assets.find(a =>
-          typeof a.name === "string" &&
-          archiveExt.some(ext => a.name.toLowerCase().endsWith(ext))
+        
+        const assets = release.assets || [];
+        const archiveExts = [".zip", ".dmg", ".exe", ".AppImage", ".tar.gz"];
+        const asset = assets.find(a => 
+          archiveExts.some(ext => a.name.toLowerCase().endsWith(ext))
         );
-        if (archiveAsset && archiveAsset.browser_download_url) {
-          resolvedZipUrl = archiveAsset.browser_download_url;
-          if (status) status.textContent = `Latest: ${release.tag_name || "release"} • Ready to download ${archiveAsset.name}`;
+
+        if (asset?.browser_download_url) {
+          resolvedZipUrl = asset.browser_download_url;
+          if (statusEl) {
+            statusEl.innerHTML = `<span style="color: var(--accent);">●</span> ${release.tag_name} ready`;
+          }
           return resolvedZipUrl;
         }
-        if (status) status.textContent = "No compressed archive (.zip/.rar/.7z) found on the latest release yet.";
+        
+        if (statusEl) statusEl.textContent = "Check GitHub for assets";
       } catch (err) {
-        if (status) status.textContent = "Could not resolve the latest archive right now.";
+        console.error("Release fetch failed:", err);
+        if (statusEl) statusEl.textContent = "Check GitHub Releases";
       }
-      resolvedZipUrl = null;
       return null;
     }
 
-    async function startAutoDownload() {
+    async function startDownload() {
       const url = await resolveLatestZipUrl();
       if (!url) {
-        alert("Latest archive is not available yet. Please upload a .zip, .rar, or .7z asset to the latest GitHub release.");
+        window.open(`https://github.com/${owner}/${repo}/releases`, "_blank");
         return;
       }
+      
       const a = document.createElement("a");
       a.href = url;
       a.download = "";
@@ -524,40 +1071,37 @@
       a.remove();
     }
 
-    function bindDownloadButtons() {
-      ["downloadBtnTop", "downloadBtnHero", "downloadBtnBottom"].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.addEventListener("click", (e) => {
-          e.preventDefault();
-          startAutoDownload();
-        });
+    // Event Listeners
+    document.getElementById("downloadBtnMain")?.addEventListener("click", startDownload);
+
+    // Intersection Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = "1";
+          entry.target.style.transform = "translateY(0)";
+        }
       });
-    }
+    }, { threshold: 0.1 });
 
-    function setupRevealAnimations() {
-      const sections = [...document.querySelectorAll(".section")];
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) entry.target.classList.add("show");
-        });
-      }, { threshold: 0.12 });
-      sections.forEach(section => observer.observe(section));
-    }
+    document.querySelectorAll(".animate-in").forEach(el => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(20px)";
+      el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+      observer.observe(el);
+    });
 
-    function maybeAutoDownloadFromQuery() {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("download") === "1") {
-        startAutoDownload();
-      }
-    }
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener("click", function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute("href"));
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
 
-    (async function init() {
-      bindDownloadButtons();
-      setupRevealAnimations();
-      await resolveLatestZipUrl();
-      maybeAutoDownloadFromQuery();
-    })();
+    // Initialize
+    resolveLatestZipUrl();
   </script>
 </body>
 </html>
