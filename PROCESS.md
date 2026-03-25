@@ -69,7 +69,7 @@ This document explains how the WinForms/VB.NET attendance system is built and ho
    - `cregister.vb`:
      - superadmin-only "create admin account" screen (blocks non-super-admins)
 
-## 3) Core data models (tables your code expects)
+## 3) Core data models
 
 These are the DB tables referenced by the `.vb` files you provided:
 
@@ -187,7 +187,7 @@ These are the DB tables referenced by the `.vb` files you provided:
 3. Super admin cannot modify their own `is_superadmin`
    - In `super_admin_panel.vb` `btnUpdate_Click` blocks updates when the selected admin `id` matches `LoggedInUserId`.
 
-## 6) Security notes (important issues found in the `.vb` code)
+## 6) Security notes
 
 These are not guesses; they are based on how values are passed/hashed in the code:
 
