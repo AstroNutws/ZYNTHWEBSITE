@@ -3,7 +3,7 @@
 This document explains how the WinForms/VB.NET attendance system is built and how the main components work together 
 
 
-## 1) External NuGets / libraries used (inferred from `Imports` + usage)
+## 1) External NuGets / libraries used
 
 1. `Npgsql`
    - PostgreSQL driver used everywhere for DB access (`dbConnect`, queries in all screens).
