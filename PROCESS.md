@@ -1,6 +1,7 @@
 # PROCESS.md
 
-This document explains how the WinForms/VB.NET attendance system is built and how the main components work together (based on your `.vb` code only; no designer code, `.resx`, or project files).
+This document explains how the WinForms/VB.NET attendance system is built and how the main components work together 
+
 
 ## 1) External NuGets / libraries used (inferred from `Imports` + usage)
 
